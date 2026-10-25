@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dungeon Leveling Toolkit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+<style>
+:root{--bg:#061823;--bg2:#082b3d;--panel:#0b3045;--deep:#071f2d;--line:#17465e;--text:#f2f7fa;--muted:#9fb5c1;--green:#35d100;--green2:#239d0b;--gold:#ffc83d;--red:#ff6b5a;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,var(--bg2),var(--bg) 70%) fixed,var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.px{font-family:"Press Start 2P","Courier New",monospace;line-height:1.5}
+.app{max-width:1040px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.logo{width:44px;height:44px;background:var(--green2);border:3px solid var(--green);box-shadow:3px 3px 0 #000;display:grid;place-items:center;font-size:20px}
+h1{margin:0;font-size:clamp(14px,3.6vw,22px)}
+.tag{color:var(--muted);font-size:13px;margin-top:4px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+nav button{flex:1 1 140px;background:var(--deep);color:var(--muted);border:2px solid var(--line);padding:12px 8px;font:inherit;font-family:"Press Start 2P","Courier New",monospace;font-size:10px;cursor:pointer;box-shadow:3px 3px 0 #000}
+nav button:hover{color:var(--text);border-color:var(--green)}
+nav button.on{background:var(--green2);color:#fff;border-color:var(--green)}
+.panel{background:var(--panel);border:2px solid var(--line);box-shadow:5px 5px 0 #000;padding:22px;margin-bottom:18px}
+h2{margin:0 0 6px;font-size:13px;color:var(--green)}
+.sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+input[type=number],input[type=text]{width:100%;padding:11px 12px;background:var(--deep);border:2px solid var(--line);color:var(--text);font:inherit}
+input:focus,button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.btn{background:var(--green2);color:#fff;border:2px solid var(--green);padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:3px 3px 0 #000}
+.btn:hover{filter:brightness(1.15)}.btn.alt{background:var(--deep);border-color:var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}
+.m{background:var(--deep);border:2px solid var(--line);padding:14px}
+.m span{display:block;color:var(--muted);font-size:13px}.m strong{display:block;font-size:22px;margin-top:4px;overflow-wrap:anywhere}
+.m small{color:var(--muted);font-size:13px;font-weight:400}
+.xp{color:var(--green)}.gold{color:var(--gold)}
+.tw{overflow-x:auto;max-height:360px;margin-top:14px;border:2px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:var(--deep);color:var(--muted);font-weight:600}
+th:first-child,td:first-child{text-align:left}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}
+.big .m{text-align:center;padding:22px 10px}.big strong{font-size:clamp(34px,9vw,56px);font-family:"Press Start 2P","Courier New",monospace}
+input[type=range]{width:100%;height:20px;accent-color:var(--green);cursor:pointer}
+.rl{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+.note{color:var(--muted);font-size:13px;margin-top:14px}
+.hide{display:none}
+@media(max-width:560px){.panel{padding:16px}nav button{flex-basis:45%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo px">⚔</div>
+  <div><h1 class="px">Dungeon Leveling</h1><div class="tag">Upgrade &amp; craft toolkit &middot; works for every item</div></div>
+</header>
+
+<nav id="nav">
+  <button data-t="cost" class="on">Upgrade cost</button>
+  <button data-t="budget">XP budget</button>
+  <button data-t="craft">Craft level</button>
+  <button data-t="formula">Formula</button>
+</nav>
+
+<section id="cost" class="tab">
+  <div class="panel">
+    <h2 class="px">Upgrade cost</h2>
+    <p class="sub">Total XP and gold to take any item from one level to another.</p>
+    <div class="grid">
+      <div><label for="from">Current item level</label><input id="from" type="number" min="1" max="1000" value="125"></div>
+      <div><label for="to">Target item level</label><input id="to" type="number" min="1" max="1000" value="150"></div>
+    </div>
+    <div class="row"><button class="btn" id="calcRange">Calculate</button><button class="btn alt" id="chain">Use target as new start</button></div>
+    <div id="rangeOut"></div>
+  </div>
+  <div class="panel">
+    <h2 class="px">Next upgrade</h2>
+    <p class="sub">What the very next level costs.</p>
+    <div class="grid"><div><label for="single">Item level</label><input id="single" type="number" min="1" max="1000" value="125"></div></div>
+    <div id="singleOut"></div>
+  </div>
+</section>
+
+<section id="budget" class="tab hide">
+  <div class="panel">
+    <h2 class="px">XP budget</h2>
+    <p class="sub">Enter the XP you have and see how far it takes your item.</p>
+    <div class="grid">
+      <div><label for="level">Current item level</label><input id="level" type="number" min="1" max="1000" value="125"></div>
+      <div><label for="xp">XP budget (e.g. 750k, 25m, 1.5b)</label><input id="xp" type="text" value="10m"></div>
+    </div>
+    <div class="row"><button class="btn" id="calcBudget">Calculate</button></div>
+    <div id="budgetOut"></div>
+  </div>
+</section>
+
+<section id="craft" class="tab hide">
+  <div class="panel">
+    <h2 class="px">Craft level</h2>
+    <p class="sub">The craft level you unlock at each player level (1–1000).</p>
+    <div class="big">
+      <div class="m"><span>Player level</span><strong id="pl">111</strong></div>
+      <div class="m"><span>Craft level</span><strong class="xp" id="cl">86</strong></div>
+    </div>
+    <input id="slider" type="range" min="1" max="1000" value="111" aria-label="Player level">
+    <div class="rl"><span>Lvl 1</span><span>Lvl 1000</span></div>
+    <div class="row"><button class="btn alt" data-step="-10">-10</button><button class="btn alt" data-step="-1">-1</button><button class="btn alt" data-step="1">+1</button><button class="btn alt" data-step="10">+10</button></div>
+    <p class="note">Below player level 60, craft level equals player level. From 60 up, every 2 player levels add 1 craft level.</p>
+  </div>
+  <div class="panel">
+    <h2 class="px">Reverse lookup</h2>
+    <p class="sub">Which player level do you need to reach a craft level?</p>
+    <div class="grid"><div><label for="cin">Target craft level (max 530)</label><input id="cin" type="number" min="1" max="530" value="100"></div></div>
+    <div id="cout"></div>
+  </div>
+  <div class="panel">
+    <h2 class="px">Milestones</h2>
+    <div class="tw"><table><thead><tr><th>Player level</th><th>Craft level</th></tr></thead><tbody id="mile"></tbody></table></div>
+  </div>
+</section>
+
+<section id="formula" class="tab hide">
+  <div class="panel">
+    <h2 class="px">Formula</h2>
+    <p class="sub">XP per upgrade is <b>min(25,000,000, step × (level − offset))</b>. Gold per upgrade is <b>min(15,000, round(a·L² + b·L + c))</b>.</p>
+    <p class="note" style="margin-top:0">The gold curve below the cap is an estimate fitted to game data, not an official formula. Compare a few levels in-game and adjust if needed. Your changes are saved in this browser.</p>
+    <div class="grid" style="margin-top:16px">
+      <div><label for="goldA">a (level²)</label><input id="goldA" type="number" step="0.000001"></div>
+      <div><label for="goldB">b (level)</label><input id="goldB" type="number" step="0.0001"></div>
+      <div><label for="goldC">c (constant)</label><input id="goldC" type="number" step="0.01"></div>
+      <div><label for="xpStep">XP increase per level</label><input id="xpStep" type="number" step="1000" min="1"></div>
+      <div><label for="xpOffset">XP offset</label><input id="xpOffset" type="number" step="1"></div>
+    </div>
+    <div class="row"><button class="btn" id="apply">Apply</button><button class="btn alt" id="reset">Reset to default</button></div>
+  </div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const DEF={a:0.1986451613,b:-23.8603225806,c:2463.766129,xpStep:50000,xpOffset:30};
+let cfg={...DEF};
+try{const s=JSON.parse(localStorage.getItem('dl-cfg')||'null');if(s&&Object.values(s).every(Number.isFinite))cfg=s;}catch(e){}
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+function short(n){n=Math.round(n);const a=Math.abs(n);
+ if(a>=1e9)return(n/1e9).toFixed(a>=1e10?0:1).replace(/\.0$/,'')+'b';
+ if(a>=1e6)return(n/1e6).toFixed(a>=1e7?0:1).replace(/\.0$/,'')+'m';
+ if(a>=1e3)return(n/1e3).toFixed(a>=1e4?0:1).replace(/\.0$/,'')+'k';
+ return String(n);}
+function parseNum(v){v=String(v).trim().toLowerCase().replace(/,/g,'.');
+ const m=v.match(/^([0-9]*\.?[0-9]+)\s*([kmb])?$/);if(!m)return NaN;
+ return parseFloat(m[1])*({k:1e3,m:1e6,b:1e9}[m[2]]||1);}
+const xpCost=l=>Math.min(25e6,Math.max(0,cfg.xpStep*(l-cfg.xpOffset)));
+const goldCost=l=>Math.min(15000,Math.max(0,Math.round(cfg.a*l*l+cfg.b*l+cfg.c)));
+const lvl=v=>{v=+v;return Number.isFinite(v)&&v>=1&&v<=1000?Math.floor(v):null};
+const val=(a,b,cls)=>`<div class="m"><span>${a}</span><strong class="${cls||''}">${b}</strong></div>`;
+const both=(n)=>`${fmt(n)} <small>(${short(n)})</small>`;
+
+function rangeCalc(){
+ const s=lvl($('from').value),e=lvl($('to').value);
+ if(s===null||e===null||e<s){$('rangeOut').innerHTML='<p class="note">Enter levels between 1 and 1000. The target must be at least the current level.</p>';return;}
+ let xp=0,g=0,rows='';
+ for(let l=s;l<e;l++){const x=xpCost(l),y=goldCost(l);xp+=x;g+=y;rows+=`<tr><td>${l} → ${l+1}</td><td>${fmt(x)}</td><td>${fmt(y)}</td></tr>`;}
+ $('rangeOut').innerHTML=`<div class="metrics">${val('Total XP',both(xp),'xp')}${val('Total gold',both(g),'gold')}${val('Upgrades',fmt(e-s))}</div>`+
+ (e>s?`<div class="tw"><table><thead><tr><th>Upgrade</th><th>XP</th><th>Gold</th></tr></thead><tbody>${rows}</tbody></table></div>`:'');
+}
+function singleCalc(){
+ const l=lvl($('single').value);
+ if(l===null){$('singleOut').innerHTML='<p class="note">Enter a level between 1 and 1000.</p>';return;}
+ $('singleOut').innerHTML=`<div class="metrics">${val(`XP for ${l} → ${l+1}`,both(xpCost(l)),'xp')}${val('Gold',both(goldCost(l)),'gold')}${val('Result','Level '+fmt(l+1))}</div>`;
+}
+function budgetCalc(){
+ const s=lvl($('level').value),b=parseNum($('xp').value);
+ if(s===null||!Number.isFinite(b)){$('budgetOut').innerHTML='<p class="note">Enter a valid level and an XP budget like 750k, 25m or 1.5b.</p>';return;}
+ let r=b,l=s,g=0,x=0,n=0;
+ while(l<1000){const c=xpCost(l);if(c>r)break;r-=c;x+=c;g+=goldCost(l);l++;n++;}
+ const capped=l>=1000?' (max)':'';
+ $('budgetOut').innerHTML=`<div class="metrics">${val('Reachable level',fmt(l)+capped,'xp')}${val('Upgrades bought',fmt(n))}${val('XP spent',both(x))}${val('Gold needed',both(g),'gold')}${val('XP left over',both(r))}${l<1000?val('Next upgrade costs',both(xpCost(l))+' XP'):''}</div>`;
+}
+const craftOf=l=>l<60?l:60+Math.ceil((l-60)/2);
+const slider=$('slider');
+function craftUpdate(){
+ const l=+slider.value;$('pl').textContent=l;$('cl').textContent=craftOf(l);
+ const p=(l-1)/999*100;slider.style.background=`linear-gradient(to right,var(--green) ${p}%,var(--line) ${p}%)`;
+}
+function reverse(){
+ const c=Math.floor(+$('cin').value);
+ if(!(c>=1&&c<=530)){$('cout').innerHTML='<p class="note">Enter a craft level between 1 and 530 (the max at player level 1000).</p>';return;}
+ const p=c<=60?c:2*c-61;
+ $('cout').innerHTML=`<div class="metrics">${val('Player level needed',p,'xp')}${val('Craft level',c)}</div>`;
+}
+let mr='';for(const l of [1,10,20,30,40,50,60,75,100,111,125,150,200,250,300,400,500,600,700,800,900,1000])mr+=`<tr><td>${l}</td><td>${craftOf(l)}</td></tr>`;
+$('mile').innerHTML=mr;
+
+function sync(){$('goldA').value=cfg.a;$('goldB').value=cfg.b;$('goldC').value=cfg.c;$('xpStep').value=cfg.xpStep;$('xpOffset').value=cfg.xpOffset;}
+function all(){rangeCalc();singleCalc();budgetCalc();}
+function save(){try{localStorage.setItem('dl-cfg',JSON.stringify(cfg));}catch(e){}}
+
+$('calcRange').onclick=rangeCalc;$('calcBudget').onclick=budgetCalc;
+$('chain').onclick=()=>{$('from').value=$('to').value;$('to').value=Math.min(1000,+$('from').value+25);rangeCalc();};
+['from','to'].forEach(i=>$(i).addEventListener('input',rangeCalc));
+$('single').addEventListener('input',singleCalc);
+['level','xp'].forEach(i=>$(i).addEventListener('input',budgetCalc));
+$('cin').addEventListener('input',reverse);
+slider.addEventListener('input',craftUpdate);
+document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{slider.value=Math.max(1,Math.min(1000,+slider.value+ +b.dataset.step));craftUpdate();});
+$('apply').onclick=()=>{const n={a:parseFloat($('goldA').value),b:parseFloat($('goldB').value),c:parseFloat($('goldC').value),xpStep:parseNum($('xpStep').value),xpOffset:parseFloat($('xpOffset').value)};
+ if(!Object.values(n).every(Number.isFinite))return;cfg=n;save();all();};
+$('reset').onclick=()=>{cfg={...DEF};save();sync();all();};
+
+function show(t){
+ if(!document.getElementById(t))t='cost';
+ document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('hide',s.id!==t));
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{show(b.dataset.t);try{history.replaceState(null,'','#'+b.dataset.t);}catch(e){}});
+sync();all();craftUpdate();reverse();
+show(location.hash.slice(1)||'cost');
+</script>
+</body>
+</html>
